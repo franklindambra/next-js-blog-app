@@ -1,17 +1,14 @@
-// app/posts/[id]/page.tsx
-
 import prisma from "@/lib/db";
 import { notFound } from "next/navigation";
 
-// Main Post Component
-export default async function PostPage({ params }: { params: { id: string } }) {
-  const postId = parseInt(params.id, 10);
+export default async function Page({ params }: { params: { id: string } }) {
   const post = await prisma.post.findUnique({
-    where: { id: postId },
+    where: {
+      id: parseInt(params.id),
+    },
   });
-
   if (!post) {
-    notFound(); // Return 404 if post not found
+    notFound();
   }
 
   return (
@@ -21,17 +18,3 @@ export default async function PostPage({ params }: { params: { id: string } }) {
     </main>
   );
 }
-
-// Generate static paths for posts with ISR
-export async function generateStaticParams() {
-  const posts = await prisma.post.findMany({
-    select: { id: true },
-  });
-
-  return posts.map((post) => ({
-    id: post.id.toString(),
-  }));
-}
-
-// Configure ISR-like behavior
-export const revalidate = 60; 
